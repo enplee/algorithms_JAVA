@@ -1,4 +1,4 @@
-package enplee.algorithms.leetcode;
+package enplee.algorithms_JAVA.leetcode;
 
  public class TreeNode {
      int val;

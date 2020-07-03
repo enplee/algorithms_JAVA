@@ -1,15 +1,8 @@
-package enplee.algorithms.leetcode;
+package enplee.algorithms_JAVA.leetcode;
 
-import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.Out;
-import edu.princeton.cs.algs4.Stack;
-import enplee.VM.test.TestAlloction;
-import org.w3c.dom.Node;
-
-import java.io.ObjectInputStream;
 import java.util.*;
 import java.util.List;
-
+import enplee.algorithms_JAVA.leetcode.*;
 /**
  * @author lee
  * 内容：leetcode的相关代码java版本
