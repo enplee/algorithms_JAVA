@@ -1,2 +1,2 @@
-# Java4leetcode
-对leetcode中的部分习题通过java实现
+# algorithms_JAVA
+使用java语言实现一些常用的算法：leetcode，algorithms4
