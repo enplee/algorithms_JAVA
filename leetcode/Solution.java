@@ -2,6 +2,8 @@ package enplee.algorithms_JAVA.leetcode;
 
 import java.util.*;
 import java.util.List;
+
+import edu.princeton.cs.algs4.In;
 import enplee.algorithms_JAVA.leetcode.*;
 /**
  * @author lee
@@ -11,10 +13,7 @@ import enplee.algorithms_JAVA.leetcode.*;
 public class Solution {
 
     public static void main(String[] args) {
-        int[] nums = new int[]{6,10,12,3,29,21,12,25,17,19,16,1,2,24,9,17,25,22,12,22,26,24,24,11,3,7,24,5,15,30,23,5,20,10,19,20,9,27,11,4,23,4,4,12,22,27,16,11,26,10,23,26,16,21,24,21,17,13,21,9,16,17,27};
-        int target = 26;
-        System.out.println(numSubseq(nums,target));
-        System.out.println(Math.pow(2,2));
+        System.out.println(-5%4);
     }
 
     public int[][] reconstructQueue(int[][] people) {
@@ -601,7 +600,7 @@ public class Solution {
         return res;
     }
     public int firstMissingPositive(int[] nums) {
-        /**
+        /*
          *  41. 缺失的第一个正整数 类归巢
          */
         int len = nums.length;
@@ -638,7 +637,7 @@ public class Solution {
         return (int)res%(1000000000+7);
     }
     public boolean canArrange(int[] arr, int k) {
-        /**
+        /*
          *  5449. 检查数组对是否可以被 k 整除  整除的问题考虑取余的思想  类数学
          *  刚开始考虑搜索，能解决超时，剪枝仍然超时
          */
@@ -657,7 +656,7 @@ public class Solution {
         return true;
     }
     public int findLength(int[] A, int[] B) {
-        /**
+        /*
          * 718. 最长重复子数组 典型动态规划
          */
         int[] dp = new int[A.length];
@@ -676,7 +675,7 @@ public class Solution {
         return res;
     }
     public List<String> topKFrequent(String[] words, int k) {
-        /**
+        /*
          *  692. 前K个高频单词
          */
         Map<String,Integer> map  = new HashMap<>();
@@ -723,6 +722,418 @@ public class Solution {
             if(item[2]<n-1) pq.offer(new int[]{matrix[item[1]][item[2]+1],item[1],item[2]+1});
         }
         return item[0];
+    }
+    public int longestValidParentheses(String s) {
+        /*
+         * 32. 最长有效括号
+         * 思路1: 指针
+         */
+        int left = 0,right = 0,res = 0;
+        for(int i=0;i<s.length();i++){
+            if(s.charAt(i)=='(') left++;
+            else right++;
+            if(left==right) res = Math.max(res,left);
+            else if(right>left){
+                left = 0;
+                right = 0;
+            }
+        }
+        left = 0;
+        right =0;
+        for(int i=s.length()-1;i>=0;i--){
+            if(s.charAt(i)=='(') left++;
+            else right++;
+            if(left==right) res = Math.max(res,left);
+            else if(left>right){
+                left = 0;
+                right = 0;
+            }
+        }
+        return res;
+    }
+    public int longestValidParentheses_2(String s){
+        /*
+         *  32. 最长有效括号
+         *  思路2: 动态规划
+         *        1.状态定义：dp[i]是以i位置结尾的合法括号
+         *        2.状态转移：s[i]: if '(' dp[i]=0  if ')': 1.s[i-1]=='(' dp[i] = dp[i-2]+2
+         *                                                2.s[i-1]==')' if s[i-1-dp[i-1]]=='(' dp[i] = dp[i-1]+2+next
+         *        3.初始状态：s[0]=0;s[1]==2 if"()" else 0
+         */
+        int len = s.length(),res = 0;
+        if(len<=1) return 0;
+        int[] dp = new int[len];
+        if(s.charAt(0)=='(' && s.charAt(1)==')'){
+            dp[1] = 2;
+            res = 2;
+        }
+        for(int i=2;i<len;i++){
+            if(s.charAt(i)==')'){
+                if(s.charAt(i-1)=='('){
+                    dp[i] = dp[i-2]+2;
+                }else {
+                    int next = i-1;
+                    int temp = next-dp[next];
+                    if(dp[next]>0  && temp>=0 && s.charAt(temp)=='('){
+                        dp[i] += dp[next]+2;
+                        if(temp>=1) dp[i] += dp[temp-1];
+                    }
+                }
+            }
+            res = Math.max(res,dp[i]);
+        }
+        return res;
+    }
+    public boolean isMatch(String s, String p) {
+        /*
+         *  44. 通配符匹配
+         *      1.动态规划的处理：
+         *             -1: dp[i][j]是s[0-i]与p[0-j]是否匹配
+         *             -2: 状态转移: if(*) dp[i][j] = dp[i-1][j] || dp[i][j-1];!!!!
+         *      2.改善的细节：利用加入""空字符，解决*匹配空的问题
+         */
+        int lenS = s.length(),lenP = p.length();
+        boolean[][] dp = new boolean[lenS+1][lenP+1];
+
+        dp[0][0] = true;
+        for(int i=1;i<=lenS;i++){
+            if(s.charAt(i-1)=='*'){
+                dp[i][0] = true;
+            }else break;
+        }
+        for(int j=1;j<=lenP;j++){
+            if(p.charAt(j-1)=='*'){
+                dp[0][j] = true;
+            }else break;
+        }
+        for (int i=1;i<=lenS;i++){
+            for (int j=1;j<=lenP;j++){
+                if(s.charAt(i-1)==p.charAt(j-1) || p.charAt(j-1)=='?'){
+                    dp[i][j] = dp[i-1][j-1];
+                }else if(p.charAt(j-1)=='*'){
+                    dp[i][j] = dp[i-1][j] || dp[i][j-1];
+                }
+            }
+        }
+        // for(int i=0;i<=lenS;i++){
+        //     System.out.println(Arrays.toString(dp[i]));
+        // }
+        return dp[lenS][lenP];
+    }
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        /*
+         *  63. 不同路径 II 经典dp 细节
+         */
+        int m = obstacleGrid.length;
+        if(m==0) return 0;
+        int n = obstacleGrid[0].length;
+        int[] dp = new int[n];
+
+        if(obstacleGrid[0][0]==0) dp[0] = 1;
+        for(int i=1;i<n;i++){
+            if(obstacleGrid[0][i]==0) dp[i] = dp[i-1];
+        }
+        for(int i=1;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(j==0){
+                    if(obstacleGrid[i][j]==1) dp[j] = 0;
+                }else {
+                    if(obstacleGrid[i][j]==1){
+                        dp[j] = 0;
+                    }else {
+                        dp[j] += dp[j-1];
+                    }
+                }
+            }
+        }
+        return dp[n-1];
+    }
+
+    @Deprecated
+    public String removeKdigits(String num, int k) {
+        /*
+         *  402. 移掉K位数字 删除效率实在不高
+         */
+        StringBuilder sb = new StringBuilder(num);
+        int n = num.length();
+        for(int i =0;i<k;i++){
+            for(int j=0;j<sb.length();j++){
+                if(j<sb.length()-1){
+                    if(sb.charAt(j)>sb.charAt(j+1)){
+                        sb.deleteCharAt(j);
+                        break;
+                    }
+                }else {
+                    sb.deleteCharAt(sb.length()-1);
+                    break;
+                }
+            }
+        }
+        while (sb.length()>0 && sb.charAt(0)=='0') sb.deleteCharAt(0);
+        if(sb.length()==0) sb.append('0');
+        return sb.toString();
+    }
+    public String removeKdigits_2(String num, int k) {
+        /*
+         *  402. 移掉K位数字 单调栈操作 高明
+         */
+        Deque<Character> stack = new LinkedList<>();
+        int popNum = 0;
+        for(char c:num.toCharArray()){
+            if(stack.size()==0 || stack.peekLast()<c){
+                stack.offerLast(c);
+            }else {
+                while (popNum<k && stack.size()>0 && stack.peekLast()>c){
+                    stack.pollLast();
+                }
+                stack.offerLast(c);
+            }
+        }
+        System.out.println(stack.toString());
+        StringBuilder sb = new StringBuilder();
+        for(char c : stack){
+            if(!(sb.length()==0 && c=='0')){
+                sb.append(c);
+            }
+        }
+        if(sb.length()==0) sb.append('0');
+        return sb.toString();
+    }
+
+    @Deprecated
+    public String removeDuplicateLetters(String s) {
+        /*
+         *  316. 去除重复字母 与402相同 单调栈
+         */
+        Deque<Character> stack = new LinkedList<>();
+        Map<Character,Integer> counter = new HashMap<>();
+        Set<Character> inStact = new HashSet<>();
+
+        for(char c : s.toCharArray()){
+            counter.put(c,counter.getOrDefault(c,0)+1);
+        }
+
+        for(char c : s.toCharArray()){
+            if(!inStact.contains(c)){
+                while (stack.size()>0 && stack.peekLast()>c && counter.get(stack.peekLast())>0){
+                    inStact.remove(stack.pollLast());
+                }
+                stack.offerLast(c);
+                inStact.add(c);
+            }
+            counter.put(c,counter.get(c)-1);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for(char c : stack) sb.append(c);
+        return sb.toString();
+    }
+
+    public String removeDuplicateLetters_1(String s){
+        /*
+         *  316. 去除重复字母 与402相同 单调栈 改进map的用法 map的作用只是区分当前stack中是否是最后一个了
+         */
+        Deque<Character> stack = new LinkedList<>();
+        Map<Character,Integer> map = new HashMap<>();
+        Set<Character> inStact = new HashSet<>();
+
+        for(int i=0;i<s.length();i++) map.put(s.charAt(i),i);
+
+        for(int i=0;i<s.length();i++){
+            char c = s.charAt(i);
+            if(!inStact.contains(c)){
+                while (!stack.isEmpty() && stack.peekLast()>c && map.get(stack.peekLast())>i){
+                    inStact.remove(stack.pollLast());
+                }
+                stack.offerLast(c);
+                inStact.add(c);
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for(char c : stack) sb.append(c);
+        return sb.toString();
+    }
+    public boolean hasPathSum(TreeNode root, int sum) {
+        
+        if(root==null){
+            if(sum == 0) return true;
+            else return false;
+        }
+        if(hasPathSum(root.left,sum-root.val)) return true;
+        else return hasPathSum(root.right,sum-root.val);
+    }
+
+    public int respace(String[] dictionary, String sentence) {
+        /*
+         *  面试题 17.13. 恢复空格 暴力dp  java的subString表现有点差 几乎超时
+         */
+        int n = sentence.length();
+        int[] dp = new int[n+1];
+        Set<String> set = new HashSet<>();
+        for(String s : dictionary) set.add(s);
+
+        for(int i=1;i<n+1;i++){
+            dp[i] = dp[i] + 1;
+            for(int j=0;j<i;j++){
+                if(set.contains(sentence.substring(j,i))){
+                    dp[i] = Math.min(dp[i],dp[j]);
+                }
+            }
+        }
+        return dp[n];
+    }
+/*    public int respace_1(String[] dictionary,String sentence){
+        *//*
+         * 面试题 17.13. 恢复空格 dp+Trie 优化搜索
+         *//*
+        Trie trie = new Trie();
+        for(String s:dictionary) trie.reverseInsert(s);
+        int n = sentence.length();
+        int[] dp = new int[n+1];
+
+        for(int i=1;i<n+1;i++){
+            dp[i] = dp[i] + 1;
+            List<Integer> idxList = trie.search(sentence,i);
+            for(int j : idxList){
+                dp[i] = Math.min(dp[i],)
+            }
+        }
+
+    }*/
+
+    public int balancedString(String s) {
+
+        Map<Character,Integer> map = new HashMap<>();
+        for(char c : s.toCharArray()) map.put(c,map.getOrDefault(c,0)+1);
+        int N = s.length();
+        int cnt = N/4;
+        int left = 0,right = 0,res = N;
+        while (right<N){
+            while (right<N && (map.get("Q")>cnt || map.get("E")>cnt || map.get("W")>cnt || map.get("R")>cnt)){
+                map.put(s.charAt(right),map.get(s.charAt(right))-1);
+                right++;
+            }
+            while (left<right && map.get("Q")<=cnt && map.get("E")<=cnt && map.get("W")<=cnt && map.get("R")<=cnt){
+                map.put(s.charAt(left),map.get(s.charAt(left))+1);
+                left++;
+            }
+            res = Math.min(res,right-left+1);
+        }
+        return res;
+    }
+
+    public int[] intersect(int[] nums1, int[] nums2) {
+        /**
+         *  350. 两个数组的交集 II
+         *  map计数+小优化
+         */
+        int len1 = nums1.length,len2 = nums2.length;
+        if(len1>len2) return intersect(nums2,nums1);
+
+        Map<Integer,Integer> map = new HashMap<>();
+        for(int num:nums1) map.put(num,map.getOrDefault(num,0)+1);
+        int[] res = new int[len1];
+        int cnt = 0;
+
+        for(int num:nums2){
+            if(map.containsKey(num) && map.get(num)>0){
+                res[cnt++] = num;
+                map.put(num,map.get(num)-1);
+            }
+        }
+        return Arrays.copyOfRange(res,0,cnt);
+    }
+
+    public int[] intersect_1(int[] nums1,int[] nums2){
+        /*
+            350. 两个数组的交集 II
+            排序+双指针
+         */
+        int lab1 = 0,lab2 = 0,cnt = 0;
+        int[] res = new int[nums1.length];
+        Arrays.sort(nums1);
+        Arrays.sort(nums2);
+
+        while(lab1<nums1.length && lab2<nums2.length){
+            if(nums1[lab1] == nums2[lab2]){
+                res[cnt++] = nums1[lab1++];
+                lab2++;
+            }else if(nums1[lab1]>nums2[lab2]){
+                lab2++;
+            }else lab1++;
+        }
+        return Arrays.copyOfRange(res,0,cnt);
+    }
+
+    public int totalHammingDistance(int[] nums) {
+        /*
+         * 477. 汉明距离总和 暴力法超时
+         */
+        int res = 0;
+        for(int i=0;i<nums.length;i++){
+            for(int j=i+1;j<nums.length;j++){
+                res += HammingDistance(nums[i],nums[j]);
+            }
+        }
+        return res;
+    }
+    private int HammingDistance(int num1,int num2){
+        int temp = num1 ^ num2;
+        int cnt = 0;
+        for(int i = 0;i<32;i++){
+            if((temp & (1<<i))==1) cnt++;
+        }
+        return cnt;
+    }
+
+    public int totalHammingDistance_1(int[] nums){
+        /*
+         *  477. 汉明距离总和 关键思想：01集合 互不相同的个数 是cnt_1 * cnt_0 
+         */
+        int res = 0;
+        for(int i=0;i<32;i++){
+            int cntZero = 0;
+            for(int num:nums){
+                if((num & (1<<i))==0) cntZero++;
+            }
+            res += cntZero*(nums.length-cntZero);
+        }
+        return res;
+    }
+
+    public int wiggleMaxLength(int[] nums) {
+        /*
+         *  376. 摆动序列 直接贪心思想 直接找波动
+         */
+        int n = nums.length;
+        if(n<=1) return n;
+        int cnt = nums[1]!=nums[0]? 2:1;
+        int lab = getLab(nums[1],nums[0]);
+
+        for(int i=2;i<n;i++){
+            int temp = getLab(nums[i],nums[i-1]);
+            if(temp!=0 && (lab==0 || lab != temp)){
+                cnt++;
+                lab = temp;
+            }
+        }
+        return cnt;
+    }
+    private int getLab(int a,int b){
+        if(a==b) return 0;
+        else return a>b? 1:-1;
+    }
+
+    public int numTrees(int n) {
+        int[] dp = new int[n+1];
+        dp[0] = 1;
+        for(int i =1;i<=n;i++){
+            for(int j=0;j<=i-1;j++){
+                dp[i] += dp[j]*dp[i-1-j];
+            }
+        }
+        return dp[n];
     }
 }
 
