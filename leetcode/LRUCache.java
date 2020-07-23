@@ -75,6 +75,7 @@ public class LRUCache {
         public LRUNode(int key, int value) {
             this.key = key;
             this.value = value;
+
         }
 
     }
