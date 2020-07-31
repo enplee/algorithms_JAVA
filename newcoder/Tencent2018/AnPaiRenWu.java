@@ -7,6 +7,11 @@ import java.util.Scanner;
 /**
  * https://www.nowcoder.com/questionTerminal/42e7ff5c5696445ab907caff17fc9e15
  * 安排任务
+ * 题目要求：尽可能的多执行任务
+ * 思路：如果只有一个时间指标，那么我们可以贪心的物尽其用，让能工作时长最长的机器尽可能去执行时间最长的任务；
+ *      对于两个评价指标，工作时间和任务难度，贪心法则认为：满足时间的情况下，每次执行用难度低的机器去完成任务
+ *      程序设计来说：对于每个任务，先找到所有满足时间尺度的机器，然后选择其中难度最低的
+ *                 每个任务和机器仍然按照升序排列，遵循尽可能去完成最高要求的任务
  */
 public class AnPaiRenWu {
     public static void main(String[] args) {
@@ -32,12 +37,9 @@ public class AnPaiRenWu {
         int cnt = 0;
         long cntIncome = 0;
         int[] moLab = new int[101];
-        Arrays.sort(machine, new Comparator<int[]>() {
-            @Override
-            public int compare(int[] o1, int[] o2) {
-                if(o1[0]==o2[0]) return o1[1] - o2[1];
-                return o1[0] - o2[0];
-            }
+        Arrays.sort(machine, (o1, o2) -> {
+            if(o1[0]==o2[0]) return o1[1] - o2[1];
+            return o1[0] - o2[0];
         });
         Arrays.sort(job, (o1, o2) -> {
             if(o1[0]==o2[0]) return o1[1] - o2[1];
