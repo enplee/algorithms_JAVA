@@ -15,13 +15,16 @@ public class TiquZhengshu {
     }
     public static String solution(String s){
         StringBuilder sb = new StringBuilder();
+        int lab = 1;
         for(char c : s.toCharArray()){
+            if(c=='-'&&sb.length()==0) lab = -1;
             if(c>='0' && c<='9') {
                 if(c!='0' || sb.length()!=0){
                     sb.append(c);
                 }
             }
         }
-        return sb.toString();
+        String res = sb.toString();
+        return lab==-1 ? "-"+res:res;
     }
 }
