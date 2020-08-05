@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.List;
 
 import edu.princeton.cs.algs4.In;
+import enplee.DesignPattern.Decorator.Mocha;
 import enplee.algorithms_JAVA.leetcode.*;
 /**
  * @author lee
@@ -1134,6 +1135,131 @@ public class Solution {
             }
         }
         return dp[n];
+    }
+    public int countGoodTriplets(int[] arr, int a, int b, int c) {
+        int len = arr.length;
+        int res = 0;
+        for(int i=0;i<len;i++){
+            for(int j=i+1;j<len;j++){
+                if(Math.abs(arr[i]-arr[j])<=a){
+                    for (int k=j+1;k<len;k++){
+                        if(Math.abs(arr[i]-arr[k])<=c && Math.abs(arr[j]-arr[k])<=b){
+                            res++;
+                        }
+                    }
+                }
+            }
+        }
+        return res;
+    }
+    public int getWinner(int[] arr, int k) {
+        int maxN = arr[0];
+        int len = arr.length;
+        for(int i=1;i<len;i++) {
+            if(arr[i]>maxN) maxN = arr[i];
+        }
+        if(k>=len) return maxN;
+        Deque<Integer> queue = new LinkedList<>();
+        for(int i=0;i<len;i++) queue.add(arr[i]);
+        int temp = queue.pollFirst();
+        int cnt = 0;
+        while (cnt<k){
+            int comNum = queue.pollFirst();
+            if(comNum>temp){
+                cnt = 1;
+                queue.offerLast(temp);
+                temp = comNum;
+            }else {
+                cnt++;
+                queue.offerLast(comNum);
+            }
+        }
+        return temp;
+    }
+    public int minSwaps(int[][] grid) {
+        int len = grid.length;
+        List<Integer> list = new ArrayList<>();
+        for(int i=0;i<len;i++){
+            for(int j=len-1;j>=0;j--){
+                int cnt = 0;
+                while (grid[i][j]==0) cnt++;
+                list.add(cnt);
+            }
+        }
+        Integer[] arr = (Integer[]) list.toArray();
+        Arrays.sort(arr);
+        for(int i=0;i<=len-1;i++){
+            if(arr[i]<i) return -1;
+        }
+        List<Integer> noPos = new ArrayList<>();
+        for(int i=0;i<len;i++){
+            if(list.get(i)<i) noPos.add(i);
+        }
+        if(noPos.size()==0) return 0;
+        return 0;
+    }
+    public static final int MOD = 1000000000+7;
+    public int maxSum(int[] nums1, int[] nums2) {
+        Map<Integer,Integer[]> map = new HashMap<>();
+        for(int i=0;i<nums1.length;i++){
+            map.put(nums1[i],new Integer[]{i,-1});
+        }
+        for(int i=0;i<nums2.length;i++){
+            Integer[] temp = map.getOrDefault(nums2[i],new Integer[]{-1,-1});
+            temp[1] = i;
+            map.put(nums2[i],temp);
+        }
+        return (int) Math.max(
+                dfs(map,nums1,nums2,0,true),
+                dfs(map,nums1,nums2,0,false)
+        )%MOD;
+    }
+    public long dfs(Map<Integer,Integer[]> map,int[] nums1,int[] nums2,int pos,boolean w){
+        if(w){
+            if(pos>=nums1.length) return 0;
+            Integer[] temp = map.get(nums1[pos]);
+            if(temp[1]!=-1){
+                return Math.max(
+                        dfs(map,nums1,nums2,pos+1,true),
+                        dfs(map,nums1,nums2,temp[1]+1,false)
+                )%MOD+nums1[pos];
+            }else {
+                return dfs(map,nums1,nums2,pos+1,true)%MOD+nums1[pos];
+            }
+        }else {
+            if(pos>=nums2.length) return 0;
+            Integer[] temp = map.get(nums2[pos]);
+            if(temp[0]!=-1){
+                return Math.max(
+                        dfs(map,nums1,nums2,pos+1,false),
+                        dfs(map,nums1,nums2,temp[0]+1,true)
+                )%MOD+nums2[pos];
+            }else {
+                return dfs(map,nums1,nums2,pos+1,false)%MOD+nums2[pos];
+            }
+        }
+    }
+    public int maxSum1(int[] nums1, int[] nums2) {
+        long res = 0;
+        long temp1 = 0;
+        long temp2 = 0;
+        int i=0,j=0;
+        while (i<nums1.length && j<nums2.length){
+            if(nums1[i]<nums2[j]){
+                temp1+=nums1[i];
+            }else if(nums1[i]>nums2[j]){
+                temp2+=nums2[j];
+            }else {
+                res = res%MOD + (Math.max(temp1,temp2)+nums1[i])%MOD;
+            }
+        }
+        if(i<nums1.length){
+            res = (res+nums1[i])%MOD;
+        }
+        if(j<nums2.length){
+            res = (res+nums2[j])%MOD;
+        }
+        return (int)res;
     }
 }
 
